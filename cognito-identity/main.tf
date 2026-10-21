@@ -74,6 +74,10 @@ resource "aws_cognito_user_pool_client" "ui" {
   callback_urls = var.callback_urls
   logout_urls   = var.logout_urls
 
+  depends_on = [
+    aws_cognito_resource_server.api
+  ]
+
   access_token_validity  = 15
   id_token_validity      = 15
   refresh_token_validity = 7
@@ -111,9 +115,5 @@ resource "aws_cognito_user_pool_client" "machine" {
 resource "aws_cognito_user_pool_domain" "this" {
   domain          = var.custom_domain
   user_pool_id    = aws_cognito_user_pool.this.id
-  certificate_arn = aws_acm_certificate.cognito.arn
-
-  depends_on = [
-    aws_cognito_resource_server.api
-  ]
+  certificate_arn = aws_acm_certificate_validation.cognito.certificate_arn
 }
