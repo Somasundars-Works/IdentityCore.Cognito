@@ -1,0 +1,38 @@
+name: Terraform Validate and Lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    name: Terraform Format  (${{ matrix.directory }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - cognito-identity
+          - somasundars-com
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Initialize Terraform
+        run: terraform init -backend=false -input=false
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+
+      - name: Validate Terraform
+        run: terraform validate
